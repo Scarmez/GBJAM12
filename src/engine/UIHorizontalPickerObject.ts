@@ -1,0 +1,51 @@
+import { MenuOptionObject } from "./MenuOptionObject.js";
+import { Game } from "./Game.js";
+import { InputAction } from "../game/InputActions.js";
+import { Sprite } from "./Sprite.js";
+
+/** UI element that displays the current object selected and can screen using the left and right inputs. */
+export class UIHorizontalPickerObject extends MenuOptionObject {
+
+    private currentIndex = 0;
+    private options: PickerOption[] = [];
+    private prefix: string;
+
+    constructor(text: string, font: Sprite){
+        super(text, font, function(){});
+        this.prefix = text;
+    }
+
+    public addOption(option:PickerOption){
+        this.options.push(option);
+        if(this.options.length == 1) this.setText(this.prefix + option.text);
+    }
+
+    public removeOption(index:number){
+        this.options.splice(index, 1);
+    }
+
+    protected update(delta: number): void {
+        if(this._selected){
+            if(Game.i.input.isPressed(InputAction.LEFT)){
+                Game.i.input.usedPress(InputAction.LEFT)
+                this.currentIndex--;
+                if(this.currentIndex < 0) this.currentIndex = this.options.length - 1;
+                this.options[this.currentIndex].onSelect();
+                this.setText(this.prefix + this.options[this.currentIndex].text);
+            }
+            if(Game.i.input.isPressed(InputAction.RIGHT)){
+                Game.i.input.usedPress(InputAction.RIGHT)
+                this.currentIndex++;
+                if(this.currentIndex >= this.options.length) this.currentIndex = 0;
+                this.options[this.currentIndex].onSelect();
+                this.setText(this.prefix + this.options[this.currentIndex].text);
+            }
+        }
+    }
+
+}
+
+interface PickerOption {
+    text: string;
+    onSelect: Function;
+}

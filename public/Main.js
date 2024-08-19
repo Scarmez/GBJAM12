@@ -1,0 +1,31 @@
+import AssetManifest from "./AssetManifest.js";
+import { Game } from "./engine/Game.js";
+import { InputAction } from "./game/InputActions.js";
+import { MainMenuScene } from "./scenes/MainMenuScene.js";
+import { SplashScene } from "./scenes/SplashScene.js";
+let game;
+window.onload = function () {
+    game = new Game({ xRes: 160, yRes: 144, scale: 4 });
+    //game.gfx.createPalette([0,0,0,0,49,35,94,255,110,87,142,255,203,171,203,255,227,215,222,255]); //Whitney
+    game.gfx.createPalette([0, 0, 0, 0, 5, 31, 57, 255, 74, 36, 128, 255, 197, 58, 157, 255, 255, 142, 128, 255]); //LAVA-GB
+    game.gfx.createPalette([0, 0, 0, 0, 15, 5, 45, 255, 32, 54, 113, 255, 54, 134, 143, 255, 95, 199, 93, 255]); // MOONLIGHT GB
+    game.gfx.createPalette([0, 0, 0, 0, 51, 44, 80, 255, 70, 135, 143, 255, 148, 227, 68, 255, 226, 243, 228, 255]); // kirokaze-gameboy
+    game.gfx.createPalette([0, 0, 0, 0, 124, 63, 88, 255, 235, 107, 111, 255, 249, 168, 117, 255, 255, 246, 211, 255]); // ice-cream-gb
+    game.gfx.createPalette([0, 0, 0, 0, 33, 30, 32, 255, 85, 85, 104, 255, 160, 160, 139, 255, 233, 239, 236, 255]); // 2bit-demichrome
+    game.gfx.createPalette([0, 0, 0, 0, 255, 255, 255, 255, 103, 114, 169, 255, 58, 50, 119, 255, 0, 0, 0, 255]); // ARQ4
+    game.gfx.setPalette(0);
+    game.assets.loadManifest(AssetManifest);
+    game.defaultBorder = game.assets.getSprite("frame1");
+    game.defaultFont = game.assets.getSprite("font");
+    game.input.addMapping("KeyZ", InputAction.A);
+    game.input.addMapping("KeyX", InputAction.B);
+    game.input.addMapping("Enter", InputAction.START);
+    game.input.addMapping("ShiftRight", InputAction.SELECT);
+    game.input.addMapping("ArrowUp", InputAction.UP);
+    game.input.addMapping("ArrowDown", InputAction.DOWN);
+    game.input.addMapping("ArrowLeft", InputAction.LEFT);
+    game.input.addMapping("ArrowRight", InputAction.RIGHT);
+    game.sm.addScene(new SplashScene());
+    game.sm.addScene(new MainMenuScene());
+    game.start();
+};
