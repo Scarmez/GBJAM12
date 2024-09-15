@@ -1,17 +1,21 @@
 import {Sprite} from "./Sprite.js";
 import {GraphicsManager} from "./GraphicsManager.js";
 import { SpriteData } from "./SpriteData.js";
+import { AudioManager } from "./AudioManager.js";
 export class AssetManager {
 
     private gfx: GraphicsManager;
+    private aud: AudioManager;
     private sprites: Map<string,Sprite> = new Map();
-
+    private audio: Map<string, HTMLAudioElement> = new Map();
+    
     /** 
      * Asset Manager is responsible for initializing assets and providing a way to access them. It needs a GraphicsManager to create the sprites. 
      * Call loadManifest with an object containing the assets to be loaded to initialize all the assets and load them into maps.
     */
-    public constructor(gfx: GraphicsManager){
+    public constructor(gfx: GraphicsManager, aud: AudioManager){
         this.gfx = gfx;
+        this.aud = aud;
         this.sprites.set("fallback", this.gfx.createSprite({width:1, height:1, pixels: [1]}));
     }
 
@@ -19,15 +23,39 @@ export class AssetManager {
      * Will load all assets in the object. It will load the asset into the relevant Map using the name of the property as the key to the Map. 
      * Loaded assets can be retreived with "getSprite() and getAudio()"
     */
-    public loadManifest(manifest: object ){
+    public loadManifest(manifest: AssetManifest ){
 
-        for(const [key, value] of Object.entries(manifest)){
-            console.log(`Creating ${key}...`)
+        let progressBar = document.createElement('progress');
+        let progressBarLabel = document.createElement('label');
+        document.body.append(progressBarLabel);
+
+        progressBarLabel.textContent = "Loading: "
+        progressBarLabel.appendChild(progressBar);
+        progressBar.value = 0;
+        progressBar.max = Object.entries(manifest.sprites).length + Object.entries(manifest.audio).length;
+
+        for(const [key, value] of Object.entries(manifest.sprites)){
+            if(key == "font_rabbit_var") console.log(value);
             this.sprites.set(key, this.gfx.createSprite(value));
-            console.log(`Finished creating ${key}...`)
-
+            if(key == "font_rabbit_var")console.log(this.sprites.get(key));
+            progressBar.value++;
         }
-        console.log(this.sprites);
+
+        for(const [key, value] of Object.entries(manifest.audio)){
+            this.loadAudio(key,value);
+            progressBar.value++;
+        }
+
+        progressBarLabel.remove()
+
+    }
+
+    loadAudio(key: string,path: string){
+        let newAudio = new Audio(path);
+        this.aud.attachAudio(newAudio);
+        console.log(`Loaded ${path}`);
+        //newAudio.play();
+        this.audio.set(key, newAudio);
     }
 
     /** Returns a Sprite object from the Map. If the Sprite doesn't exist it will return a blanl "fallback" Sprite. */
@@ -41,12 +69,19 @@ export class AssetManager {
         
     }
 
+    public setSprite(key: string, value: Sprite){
+        this.sprites.set(key, value);
+    }
+
     public getAudio(audioName: string) {
         // TO-DO: Implement audio asset management.
-        throw console.error("Have not implemented any audio yet.");
+        return this.audio.get(audioName);
         
     }
 
+}
 
-
+interface AssetManifest {
+    sprites:  object;
+    audio: object;
 }

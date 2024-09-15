@@ -45,7 +45,7 @@ export class GraphicsManager {
     }
     /** Cleared the screen using the Renderer's capabilities.*/
     clearScreen() {
-        this._renderer.clearScreen(this._palettes[this._currentPalette].colours[4]);
+        this._renderer.clearScreen(this._palettes[this._currentPalette].colours[3]);
     }
     /** Parses the Create Sprite instruction to the Renderer so that it will be created in a way that the Renderer supports. */
     createSprite(spriteData) {
@@ -57,11 +57,20 @@ export class GraphicsManager {
     }
     /** Draws a strong to the screen using the specified Font Sprite. */
     drawString(text, font, x, y) {
+        let dstxOffset = 0;
         for (let i = 0; i < text.length; i++) {
-            let charIndex = text.charCodeAt(i) - 32;
+            let charAsciiIndex = text.charCodeAt(i);
+            let charIndex = charAsciiIndex - 32;
             let srcX = charIndex * font.frameWidth % font.width;
             let srcY = Math.floor((charIndex * font.frameWidth) / font.width) * font.frameHeight;
-            this.drawImage(font, srcX, srcY, font.frameWidth, font.frameHeight, x + i * font.frameWidth, y, font.frameWidth, font.frameHeight);
+            this.drawImage(font, srcX, srcY, font.frameWidth, font.frameHeight, x + dstxOffset, y, font.frameWidth, font.frameHeight);
+            if (charAsciiIndex in font.overrides) {
+                console.log(text.charCodeAt(i));
+                dstxOffset += font.overrides[charAsciiIndex];
+            }
+            else {
+                dstxOffset += font.frameWidth;
+            }
         }
     }
     /** Used to draw Sprites that are sliced up into a 3X3 grid using the Sprite's frameWidth and frameHeight properties. */

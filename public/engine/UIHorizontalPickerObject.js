@@ -19,7 +19,7 @@ export class UIHorizontalPickerObject extends MenuOptionObject {
         this.options.splice(index, 1);
     }
     update(delta) {
-        if (this._selected) {
+        if (this._hovered) {
             if (Game.i.input.isPressed(InputAction.LEFT)) {
                 Game.i.input.usedPress(InputAction.LEFT);
                 this.currentIndex--;

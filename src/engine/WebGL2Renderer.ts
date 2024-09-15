@@ -165,15 +165,15 @@ export class WebGL2Renderer extends Renderer {
         if (srcY === undefined) { srcY = 0; }
         if (dstX === undefined) { dstX = srcX; }
         if (dstY === undefined) { dstY = srcY; }
-        if (srcWidth === undefined) { srcWidth = sprite.width; }
-        if (srcHeight === undefined) { srcHeight = sprite.height; }
+        if (srcWidth === undefined) { srcWidth = sprite.frameWidth; }
+        if (srcHeight === undefined) { srcHeight = sprite.frameHeight; }
         if (dstWidth === undefined) {
             dstWidth = srcWidth;
-            srcWidth = sprite.width;
+            srcWidth = sprite.frameWidth;
         }
         if (dstHeight === undefined) {
             dstHeight = srcHeight;
-            srcHeight = sprite.height;
+            srcHeight = sprite.frameHeight;
         }
         if (srcRotation === undefined) {
             srcRotation = 0;

@@ -3,6 +3,7 @@ import {SceneManager} from "./SceneManager.js";
 import {AssetManager} from "./AssetManager.js";
 import {InputManager} from "./InputManager.js";
 import { Sprite } from "./Sprite.js";
+import { AudioManager } from "./AudioManager.js";
 
 /** The main Game class. A singleton class that serves as the root of all Game code. */
 export class Game {
@@ -11,16 +12,15 @@ export class Game {
     public static i: Game;
 
     public gfx: GraphicsManager;
+    public aud: AudioManager;
     public sm: SceneManager;
     public assets: AssetManager;
     public input: InputManager;
 
-    public defaultBorder: Sprite | null = null;
-    public defaultFont: Sprite | null = null;
-
     public constructor(config: GameConfig){
         this.gfx = new GraphicsManager(config.xRes, config.yRes, config.scale);
-        this.assets = new AssetManager(this.gfx);
+        this.aud = new AudioManager();
+        this.assets = new AssetManager(this.gfx, this.aud);
         this.sm = new SceneManager();
         this.input = new InputManager();
         Game.i = this;

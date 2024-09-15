@@ -3,29 +3,32 @@ import { Vector2 } from "./Vector2.js";
 export class GameObject {
     parent = null;
     children = [];
+    components = [];
     enabled = true;
-    x;
-    y;
+    _x;
+    _y;
     w;
     h;
     pos;
     // properties
-    get localX() { return this.x; }
-    set localX(x) { this.x = x; }
-    get localY() { return this.y; }
-    set localY(y) { this.y = y; }
+    get localX() { return this._x; }
+    set localX(x) { this._x = x; }
+    get localY() { return this._y; }
+    set localY(y) { this._y = y; }
     get localPos() { return this.pos; }
     set localPos(pos) { this.pos = pos; }
     get globalX() { if (this.parent)
-        return this.x + this.parent.globalX; return this.x; }
+        return this._x + this.parent.globalX; return this._x; }
     get globalY() { if (this.parent)
-        return this.y + this.parent.globalY; return this.y; }
+        return this._y + this.parent.globalY; return this._y; }
     get globalPos() { if (this.parent)
         return this.pos.add(this.parent.globalPos); return this.pos; }
+    get width() { return this.w; }
+    get height() { return this.h; }
     get isEnabled() { return this.enabled; }
     constructor(x, y, w, h) {
-        this.x = x;
-        this.y = y;
+        this._x = x;
+        this._y = y;
         this.w = w;
         this.h = h;
         this.pos = new Vector2(x, y);
@@ -36,6 +39,38 @@ export class GameObject {
         this.children.push(gameObject);
         return gameObject;
     }
+    /** Adds a GameComponent to this GameObject that will be updated with the gameloop. */
+    addComponent(component) {
+        component.gameObject = this;
+        this.components.push(component);
+        return component;
+    }
+    /** Get component of Type. */
+    getComponent(type) {
+        for (let i = 0; i < this.components.length; i++) {
+            if (this.components[i].type == type)
+                return this.components[i];
+        }
+        return null;
+    }
+    /** Get component of Type. */
+    getComponents(type) {
+        let components = [];
+        for (let i = 0; i < this.components.length; i++) {
+            if (this.components[i].type == type)
+                components.push(this.components[i]);
+        }
+        return components;
+    }
+    /** Get components of Type, recursively. */
+    getComponentsRecursive(type) {
+        let components = [];
+        components.push(...this.getComponents(type));
+        for (let i = 0; i < this.children.length; i++) {
+            components.push(...this.children[i].getComponentsRecursive(type));
+        }
+        return components;
+    }
     /** Override this and it will be called by doUpdate during the game's loop. Include all physics and movement code. */
     update(delta) { }
     /** Called by the Scene class. Don't call this directly. */
@@ -43,6 +78,9 @@ export class GameObject {
         if (!this.enabled)
             return;
         this.update(delta);
+        for (let i = 0; i < this.components.length; i++) {
+            this.components[i].update(delta);
+        }
         for (let i = 0; i < this.children.length; i++) {
             this.children[i].doUpdate(delta);
         }
@@ -54,8 +92,11 @@ export class GameObject {
         if (!this.enabled)
             return;
         this.draw(gfx);
+        for (let i = 0; i < this.components.length; i++) {
+            this.components[i].draw(gfx);
+        }
         for (let i = 0; i < this.children.length; i++) {
-            this.children[i].draw(gfx);
+            this.children[i].doDraw(gfx);
         }
     }
     /** Use this the enable or disable a GameObject. When disabled, the GameObject will not Update or Draw itself or it's children. */

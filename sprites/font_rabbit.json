@@ -1,0 +1,24 @@
+{
+    "frameWidth": 8,
+    "frameHeight": 8,
+    "overrides": {
+        "!": { "frameWidth": 4 },
+        "'": { "frameWidth": 4 },
+        "(": { "frameWidth": 5 },
+        ")": { "frameWidth": 5 },
+        "*": { "frameWidth": 7 },
+        "+": { "frameWidth": 5 },
+        ",": { "frameWidth": 4 },
+        "-": { "frameWidth": 6 },
+        ".": { "frameWidth": 4 },
+        "1": { "frameWidth": 5 },
+        ":": { "frameWidth": 4 },
+        ";": { "frameWidth": 4 },
+        "<": { "frameWidth": 7 },
+        "=": { "frameWidth": 7 },
+        ">": { "frameWidth": 7 },
+        "I": { "frameWidth": 5 },
+        "[": { "frameWidth": 5 },
+        "]": { "frameWidth": 5 }
+    }
+}

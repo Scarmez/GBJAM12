@@ -1,28 +1,24 @@
 import { GameObject } from "./GameObject.js";
-import { Game } from "./Game.js";
+import { TextRendererComponent } from "./TextRendererComponent.js";
 export class MenuOptionObject extends GameObject {
-    _text;
-    get text() { return this._text; }
+    _textRenderer;
     _onSelect;
-    _selected = false;
+    _hovered = false;
     constructor(text, font, onSelect, onHover) {
         super(0, 0, 0, 0);
-        this._text = text;
         this._onSelect = onSelect;
+        this._textRenderer = this.addComponent(new TextRendererComponent(text, font));
     }
-    draw(gfx) {
-        gfx.drawString((this._selected ? ">" : " ") + this._text, Game.i.assets.getSprite("font"), this.globalX, this.globalY);
+    hover() {
+        this._hovered = true;
     }
-    select() {
-        this._selected = true;
-    }
-    deselect() {
-        this._selected = false;
+    unhover() {
+        this._hovered = false;
     }
     onSelect() {
         this._onSelect();
     }
     setText(text) {
-        this._text = text;
+        this._textRenderer.setText(text);
     }
 }

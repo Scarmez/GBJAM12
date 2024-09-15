@@ -10,7 +10,7 @@ export class UIHorizontalPickerObject extends MenuOptionObject {
     private options: PickerOption[] = [];
     private prefix: string;
 
-    constructor(text: string, font: Sprite){
+    constructor(text: string, font: string){
         super(text, font, function(){});
         this.prefix = text;
     }
@@ -25,7 +25,7 @@ export class UIHorizontalPickerObject extends MenuOptionObject {
     }
 
     protected update(delta: number): void {
-        if(this._selected){
+        if(this._hovered){
             if(Game.i.input.isPressed(InputAction.LEFT)){
                 Game.i.input.usedPress(InputAction.LEFT)
                 this.currentIndex--;

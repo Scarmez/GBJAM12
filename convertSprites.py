@@ -14,15 +14,17 @@ for filename in inDir.iterdir():
     image = Image.open(filename)
     frameHeight = image.height
     frameWidth = image.width
-    
-    dataFilename = inDir / (filename.stem + ".json")
+
+    if filename.name.startswith("font_"):
+        dataFilename = inDir / "font.json"
+    else:
+        dataFilename = inDir / (filename.stem + ".json")
 
     if(dataFilename.is_file()):
         openJsonFile = open(dataFilename)
         imageData = json.load(openJsonFile)
         if('frameHeight' in imageData): frameHeight = imageData["frameHeight"]
         if('frameWidth' in imageData): frameWidth = imageData["frameWidth"]
-
 
     if image.mode != 'P':
         print(f"{filename} not an indexed colour mode image. Image Mode: {image.mode} skipping...")

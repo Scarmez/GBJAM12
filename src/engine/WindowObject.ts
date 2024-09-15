@@ -1,16 +1,13 @@
 import {Sprite} from "./Sprite.js";
-import {SpriteObject} from "./SpriteObject.js";
-import {GraphicsManager} from "./GraphicsManager.js";
+import { GameObject } from "./GameObject.js";
+import { SpriteRendererComponent } from "./SpriteRendererComponent.js";
 
 /** Simple extension of the GameObject and SpriteObject classes that displays the sprite using the sliced method. */
-export default class WindowObject extends SpriteObject {
+export default class WindowObject extends GameObject {
 
-    constructor(sprite:Sprite, x:number, y:number, w:number,h:number){
-        super(x,y,w,h,sprite);
-    }
-
-    protected draw(gfx: GraphicsManager): void {
-        gfx.drawSliced(this.sprite, this.globalX, this.globalY, this.w, this.h);
+    constructor(spriteName:string, x:number, y:number, w:number,h:number){
+        super(x,y,w,h);
+        this.addComponent(new SpriteRendererComponent(spriteName, SpriteRendererComponent.DrawModes.Sliced));
     }
 
 }

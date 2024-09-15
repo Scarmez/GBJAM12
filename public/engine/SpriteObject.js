@@ -1,12 +1,11 @@
 import { GameObject } from "./GameObject.js";
+import { SpriteRendererComponent } from "./SpriteRendererComponent.js";
 /** Simple extension of the GameObject class that Draws a sprite to the screen. */
 export class SpriteObject extends GameObject {
-    sprite;
-    constructor(x, y, w, h, sprite) {
+    _spriteRenderer;
+    get spriteRenderer() { return this._spriteRenderer; }
+    constructor(x, y, w, h, spriteName) {
         super(x, y, w, h);
-        this.sprite = sprite;
-    }
-    draw(gfx) {
-        gfx.drawImage(this.sprite, 0, 0, undefined, undefined, this.globalX, this.globalY);
+        this._spriteRenderer = this.addComponent(new SpriteRendererComponent(spriteName));
     }
 }

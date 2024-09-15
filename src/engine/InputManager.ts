@@ -37,6 +37,17 @@ export class InputManager {
         return this.pressedKeys.includes(key);
     }
 
+    public consumeInput(action: InputAction): boolean{
+        let key = this.keyMaps.get(action);
+        if(!key) return false;
+
+        if(this.pressedKeys.includes(key)){
+            let index = this.pressedKeys.indexOf(key);
+            if(index > -1)this.pressedKeys.splice(index);
+            return true;
+        } else return false;
+    }
+
     public usedPress(action: InputAction){
         let key = this.keyMaps.get(action);
         if(!key) return false;

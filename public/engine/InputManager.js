@@ -29,6 +29,19 @@ export class InputManager {
             return false;
         return this.pressedKeys.includes(key);
     }
+    consumeInput(action) {
+        let key = this.keyMaps.get(action);
+        if (!key)
+            return false;
+        if (this.pressedKeys.includes(key)) {
+            let index = this.pressedKeys.indexOf(key);
+            if (index > -1)
+                this.pressedKeys.splice(index);
+            return true;
+        }
+        else
+            return false;
+    }
     usedPress(action) {
         let key = this.keyMaps.get(action);
         if (!key)

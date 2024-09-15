@@ -2,19 +2,20 @@ import { GraphicsManager } from "./GraphicsManager.js";
 import { SceneManager } from "./SceneManager.js";
 import { AssetManager } from "./AssetManager.js";
 import { InputManager } from "./InputManager.js";
+import { AudioManager } from "./AudioManager.js";
 /** The main Game class. A singleton class that serves as the root of all Game code. */
 export class Game {
     /** Singleton accessor */
     static i;
     gfx;
+    aud;
     sm;
     assets;
     input;
-    defaultBorder = null;
-    defaultFont = null;
     constructor(config) {
         this.gfx = new GraphicsManager(config.xRes, config.yRes, config.scale);
-        this.assets = new AssetManager(this.gfx);
+        this.aud = new AudioManager();
+        this.assets = new AssetManager(this.gfx, this.aud);
         this.sm = new SceneManager();
         this.input = new InputManager();
         Game.i = this;

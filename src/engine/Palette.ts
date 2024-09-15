@@ -24,8 +24,6 @@ export class Palette {
             this._floatRGB.push(paletteArray[i] / 255);
         }
 
-        console.log(this._colours)
-
     }
 
 
