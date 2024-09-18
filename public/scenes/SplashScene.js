@@ -22,16 +22,15 @@ export class SplashScene extends Scene {
         this.gbjamObject = this.addGameobject(new SpriteObject(0, 0, 4, 1, "splash"));
     }
     enter() {
-        console.log(this.credits);
-        this.startCoroutine(this.delayFunction(2, () => {
+        this.startCoroutine(this.delayFunctionWithInterupt(2, () => {
             this.gbjamObject?.setEnabled(false);
             this.credits?.setEnabled(true);
         }));
-        this.startCoroutine(this.delayFunction(4, () => {
+        this.startCoroutine(this.delayFunctionWithInterupt(4, () => {
             Game.i.sm.swapScene(1);
         }));
     }
-    *delayFunction(durationS, func) {
+    *delayFunctionWithInterupt(durationS, func) {
         let totalTime = 0;
         while (true) {
             let elapsed = yield;

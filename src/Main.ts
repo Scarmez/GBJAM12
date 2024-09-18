@@ -2,17 +2,24 @@ import AssetManifest from "./AssetManifest.js";
 import { Game } from "./engine/Game.js";
 import { GameSettings } from "./engine/GameSettings.js";
 import { InputAction } from "./game/InputActions.js";
-import { ChooseEggScene } from "./scenes/ChooseEgg.js";
+import { ChooseEggScene } from "./scenes/ChooseEggScene.js";
 import { HomeScene } from "./scenes/HomeScene.js";
 import { MainMenuScene } from "./scenes/MainMenuScene.js";
+import { NamePetScene } from "./scenes/NamePetScene.js";
+import { RewardScene } from "./scenes/RewardScene.js";
 import { RythymScene } from "./scenes/RhythmScene.js";
 import { SplashScene } from "./scenes/SplashScene.js";
 
 let game: Game;
 let gameSettings: GameSettings;
 
-window.onload = function(){
+let startButton = document.createElement('button');
+startButton.style.width = "200px";
+startButton.style.height = "20px";
+startButton.textContent = "START";
+startButton.onclick = ()=>{
 
+    startButton.remove();
     gameSettings = new GameSettings();
     
     gameSettings.loadAll();
@@ -39,11 +46,19 @@ window.onload = function(){
     game.input.addMapping("ArrowLeft",InputAction.LEFT);
     game.input.addMapping("ArrowRight",InputAction.RIGHT);
 
+    game.aud.setBGVolume(Number(gameSettings.getValue("bg_volume", "0.5")));
+    game.aud.setSFXVolume(Number(gameSettings.getValue("sfx_volume", "0.5")));
+
     game.sm.addScene(new SplashScene());
     game.sm.addScene(new MainMenuScene());
     game.sm.addScene(new ChooseEggScene());
+    game.sm.addScene(new NamePetScene());
     game.sm.addScene(new HomeScene());
     game.sm.addScene(new RythymScene());
+    game.sm.addScene(new RewardScene());
+
     game.start();
+    game.sm.swapScene(2);
 
 };
+document.body.append(startButton);

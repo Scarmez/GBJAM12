@@ -44,8 +44,8 @@ export class GraphicsManager {
         this._palettes.push(new Palette(paletteArray));
     }
     /** Cleared the screen using the Renderer's capabilities.*/
-    clearScreen() {
-        this._renderer.clearScreen(this._palettes[this._currentPalette].colours[3]);
+    clearScreen(index = 3) {
+        this._renderer.clearScreen(this._palettes[this._currentPalette].colours[index]);
     }
     /** Parses the Create Sprite instruction to the Renderer so that it will be created in a way that the Renderer supports. */
     createSprite(spriteData) {
@@ -56,7 +56,7 @@ export class GraphicsManager {
         this._renderer.drawImage(sprite, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth, dstHeight, flipX, flipY, srcRotation);
     }
     /** Draws a strong to the screen using the specified Font Sprite. */
-    drawString(text, font, x, y) {
+    drawString(text, font, x, y, colour = 0) {
         let dstxOffset = 0;
         for (let i = 0; i < text.length; i++) {
             let charAsciiIndex = text.charCodeAt(i);
@@ -65,7 +65,6 @@ export class GraphicsManager {
             let srcY = Math.floor((charIndex * font.frameWidth) / font.width) * font.frameHeight;
             this.drawImage(font, srcX, srcY, font.frameWidth, font.frameHeight, x + dstxOffset, y, font.frameWidth, font.frameHeight);
             if (charAsciiIndex in font.overrides) {
-                console.log(text.charCodeAt(i));
                 dstxOffset += font.overrides[charAsciiIndex];
             }
             else {

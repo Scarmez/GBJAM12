@@ -27,6 +27,6 @@ export class SceneManager {
     }
     /** Called by the Game class. Don't call this directly. */
     draw(gfx) {
-        this.scenes[this.activeSceneIndex].draw(gfx);
+        this.scenes[this.activeSceneIndex].doDraw(gfx);
     }
 }

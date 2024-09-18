@@ -4,7 +4,6 @@ import { Game } from "./Game.js";
 import { InputAction } from "../game/InputActions.js";
 import { SpriteRendererComponent } from "./SpriteRendererComponent.js";
 import { SpriteObject } from "./SpriteObject.js";
-import { Vector2 } from "./Vector2.js";
 
 export class MenuObject extends GameObject {
 
@@ -12,19 +11,27 @@ export class MenuObject extends GameObject {
     private currentIndex: number = 0;
     private cancelFunction: Function|undefined;
     private cursorObject: GameObject;
+    private changeSound: HTMLAudioElement | undefined;
 
-    constructor(frameSpriteName: string, cursorSpriteName: string, x:number, y:number, w:number, h:number){
+    public onUpInput: Function | undefined;
+    public onDownInput: Function | undefined;
+    public onLeftInput: Function | undefined;
+    public onRightInput: Function | undefined;
+
+    constructor(frameSpriteName: string, cursorSpriteName: string, x:number, y:number, w:number, h:number, selectSound?: string){
         super(x,y,w,h);
         this.cursorObject = this.addChild(new SpriteObject(8,8,8,8,cursorSpriteName));
+        this.changeSound = selectSound? Game.i.assets.getAudio(selectSound) : undefined;
         this.addComponent(new SpriteRendererComponent(frameSpriteName, SpriteRendererComponent.DrawModes.Sliced))
     }
 
-    public addOption(option: MenuOptionObject){
+    public addOption(option: MenuOptionObject): MenuOptionObject{
         this.options.push(option);
         this.addChild(option);
         if(this.options.length == 1) option.hover();
         option.localX = 16;
         option.localY = this.options.length * 8;
+        return option;
     }
 
     public selectOption(){
@@ -38,28 +45,63 @@ export class MenuObject extends GameObject {
     protected update(delta: number): void {
 
         if(Game.i.input.consumeInput(InputAction.DOWN)) {
-            this.options[this.currentIndex].unhover();
-            this.currentIndex++;
-            if(this.currentIndex >= this.options.length) this.currentIndex = 0;
-            this.options[this.currentIndex].hover();
-            this.cursorObject.localY = this.options[this.currentIndex].localY;
+            if(this.onDownInput) {
+                this.onDownInput();
+            } else {
+                this.changeIndex(1);
+            }
         }
         if(Game.i.input.consumeInput(InputAction.UP)){
-            this.options[this.currentIndex].unhover();
-            this.currentIndex--;
-            if(this.currentIndex < 0) this.currentIndex = this.options.length - 1;
-            this.options[this.currentIndex].hover();
-            this.cursorObject.localY = this.options[this.currentIndex].localY;
+            if(this.onUpInput){
+                this.onUpInput();
+            } else {
+                this.changeIndex(-1);
+            }
+            
         }
-        if(Game.i.input.consumeInput(InputAction.START) || Game.i.input.consumeInput(InputAction.A)){
+
+        if(this.onLeftInput){
+            if(Game.i.input.consumeInput(InputAction.LEFT)){
+                this.onLeftInput();
+            }
+        }
+        if(this.onRightInput){
+            if(Game.i.input.consumeInput(InputAction.RIGHT)){
+                this.onRightInput();
+            }
+        }
+        if(Game.i.input.consumeInput(InputAction.A)){
             this.selectOption();
-            Game.i.input.usedPress(InputAction.START);
-            Game.i.input.usedPress(InputAction.A);
         }
         if(Game.i.input.consumeInput(InputAction.B)){
             if(this.cancelFunction) this.cancelFunction();
         }
 
+
+    }
+
+    changeIndex(num: number){
+
+        let previousIndex = this.currentIndex;
+
+        this.currentIndex += num;
+        if(this.currentIndex >= this.options.length) this.currentIndex -= this.options.length;
+        if(this.currentIndex < 0) this.currentIndex += this.options.length;
+
+        if(this.currentIndex == previousIndex) return;
+
+        this.options[this.currentIndex].unhover();
+        this.options[this.currentIndex].hover();
+
+        if(this.cursorObject) {
+            this.cursorObject.localX = this.options[this.currentIndex].localX - 8;
+            this.cursorObject.localY = this.options[this.currentIndex].localY;
+        }
+        
+        if(this.changeSound){
+            this.changeSound.currentTime = 0;
+            this.changeSound.play();
+        }
 
     }
 

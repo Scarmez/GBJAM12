@@ -1,7 +1,9 @@
+import { EMath } from "./ExtendedMaths.js";
 /** The Scene class is a container for all GameObjects that are currently active. */
 export class Scene {
     gameObjects = [];
     coroutines = [];
+    bgPaletteIndex = 3;
     addGameobject(gameObject) {
         this.gameObjects.push(gameObject);
         return gameObject;
@@ -18,11 +20,17 @@ export class Scene {
             this.gameObjects[i].doUpdate(delta);
         }
     }
+    /** Override this and it will be called by doUpdate during the game's loop. Include all physics and movement code. */
+    draw(gfx) { }
+    lateDraw(gfx) { }
     /** Called by the SceneManager. Don't call this directly. */
-    draw(gfx) {
+    doDraw(gfx) {
+        gfx.clearScreen(this.bgPaletteIndex);
+        this.draw(gfx);
         for (let i = 0; i < this.gameObjects.length; i++) {
             this.gameObjects[i].doDraw(gfx);
         }
+        this.lateDraw(gfx);
     }
     /** Override this method to implement a function that get's called when SceneManager changes to this scene. Called by the SceneManager. Don't call this directly. */
     enter() { }
@@ -31,5 +39,35 @@ export class Scene {
     /** Start a coroutine and add it to the scene. */
     startCoroutine(generator) {
         this.coroutines.push(generator);
+    }
+    *moveTo(entity, destination, durationMs) {
+        let totalTime = 0;
+        const { localX: originalX, localY: originalY } = entity;
+        console.log(originalX);
+        while (true) {
+            let elapsed = yield;
+            totalTime += elapsed;
+            const currentTime = totalTime / durationMs;
+            const currentX = EMath.lerp(originalX, destination.x, currentTime);
+            const currentY = EMath.lerp(originalY, destination.y, currentTime);
+            entity.localX = Math.round(currentX);
+            entity.localY = Math.round(currentY);
+            if (totalTime >= durationMs) {
+                entity.localX = destination.x;
+                entity.localY = destination.y;
+                return;
+            }
+        }
+    }
+    *delayFunction(durationS, func) {
+        let totalTime = 0;
+        while (true) {
+            let elapsed = yield;
+            totalTime += elapsed;
+            if (totalTime >= durationS) {
+                func();
+                return;
+            }
+        }
     }
 }

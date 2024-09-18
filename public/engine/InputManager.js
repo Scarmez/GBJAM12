@@ -3,8 +3,8 @@ export class InputManager {
     pressedKeys = [];
     heldKeys = [];
     constructor() {
-        window.addEventListener("keydown", (e => { this.handleKeyDown(e); }));
-        window.addEventListener("keyup", (e => { this.handleKeyUp(e); }));
+        window.addEventListener("keydown", (e => { e.preventDefault(); this.handleKeyDown(e); }));
+        window.addEventListener("keyup", (e => { e.preventDefault(); this.handleKeyUp(e); }));
     }
     addMapping(key, action) {
         this.keyMaps.set(action, key);

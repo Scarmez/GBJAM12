@@ -60,8 +60,8 @@ export class GraphicsManager {
     }
 
     /** Cleared the screen using the Renderer's capabilities.*/
-    public clearScreen(){
-        this._renderer.clearScreen(this._palettes[this._currentPalette].colours[3]);
+    public clearScreen(index=3){
+        this._renderer.clearScreen(this._palettes[this._currentPalette].colours[index]);
     }
 
     /** Parses the Create Sprite instruction to the Renderer so that it will be created in a way that the Renderer supports. */
@@ -76,14 +76,12 @@ export class GraphicsManager {
         dstX?:number, dstY?:number, dstWidth?:number, dstHeight?:number,
         flipX?:boolean, flipY?:boolean, srcRotation?:number) {
 
-    
         this._renderer.drawImage(sprite, srcX, srcY, srcWidth, srcHeight, dstX, dstY, dstWidth, dstHeight, flipX, flipY, srcRotation);
-
 
     }
 
     /** Draws a strong to the screen using the specified Font Sprite. */
-    public drawString(text: string, font: Sprite, x: number, y: number){
+    public drawString(text: string, font: Sprite, x: number, y: number, colour: number = 0){
 
         let dstxOffset = 0;
         for(let i = 0; i < text.length; i++){
@@ -101,11 +99,10 @@ export class GraphicsManager {
                 x + dstxOffset, 
                 y, 
                 font.frameWidth, 
-                font.frameHeight
+                font.frameHeight 
             );
 
             if(charAsciiIndex in font.overrides){
-                console.log(text.charCodeAt(i))
                 dstxOffset += font.overrides[charAsciiIndex];
             } else {
                 dstxOffset += font.frameWidth;

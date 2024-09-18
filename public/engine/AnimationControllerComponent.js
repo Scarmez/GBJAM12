@@ -4,8 +4,12 @@ export class AnimationControllerComponent extends GameComponent {
     _onAnimationEnd = [];
     _spriteRenderer;
     _frameSpeed = .5;
+    _numPlays = 0;
     _frame = 0;
     _frameTime = 0;
+    _animationConfig;
+    _numFrames = 0;
+    _yFrame = 0;
     _playedOnce = false;
     _ended = false;
     loop = false;
@@ -16,9 +20,23 @@ export class AnimationControllerComponent extends GameComponent {
     addOnEndEvent(f) {
         this._onAnimationEnd.push(f);
     }
-    constructor(spriteRenderer) {
+    clearOnEndEvents() {
+        this._onAnimationEnd = [];
+    }
+    constructor(animationConfig, spriteRenderer) {
         super();
+        this._numFrames = Object.values(animationConfig)[0].frames;
+        this._animationConfig = animationConfig;
         this._spriteRenderer = spriteRenderer;
+    }
+    setAnimation(name) {
+        if (name in this._animationConfig) {
+            this._numFrames = this._animationConfig[name].frames;
+            this._yFrame = this._animationConfig[name].yFrame;
+        }
+        else {
+            console.error(`Animation ${name} doesn't exist.`);
+        }
     }
     update(delta) {
         if (this.paused)
@@ -27,7 +45,7 @@ export class AnimationControllerComponent extends GameComponent {
         if (this._frameTime >= this._frameSpeed) {
             this._frame++;
             this._frameTime -= this._frameSpeed;
-            if (this._frame >= this._spriteRenderer.getSprite().xFrames) {
+            if (this._frame >= this._numFrames) {
                 this._playedOnce = true;
                 if (this.loop == true) {
                     this._frame = 0;
@@ -40,10 +58,16 @@ export class AnimationControllerComponent extends GameComponent {
                     }
                 }
             }
-            this._spriteRenderer.setFrame(this._frame, 0);
+            this._spriteRenderer.setFrame(this._frame, this._yFrame);
         }
     }
-    play() {
+    play(numTimes) {
+        if (numTimes) {
+            this._numPlays = numTimes;
+        }
+        else {
+            this._numPlays = 1;
+        }
         this._frame = 0;
         this._frameTime = 0;
         this._playedOnce = false;

@@ -7,8 +7,8 @@ export class InputManager {
     private heldKeys: string[] = [];
 
     constructor(){
-        window.addEventListener("keydown", (e=>{this.handleKeyDown(e)}));
-        window.addEventListener("keyup", (e=>{this.handleKeyUp(e)}));
+        window.addEventListener("keydown", (e=>{e.preventDefault(); this.handleKeyDown(e)}));
+        window.addEventListener("keyup", (e=>{e.preventDefault(); this.handleKeyUp(e)}));
     }
 
     public addMapping(key:string, action:InputAction ){

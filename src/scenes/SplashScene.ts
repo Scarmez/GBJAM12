@@ -31,18 +31,17 @@ export class SplashScene extends Scene {
 
     public enter(): void {
 
-        console.log(this.credits);
-        this.startCoroutine(this.delayFunction(2, ()=>{ 
+        this.startCoroutine(this.delayFunctionWithInterupt(2, ()=>{ 
             this.gbjamObject?.setEnabled(false);
             this.credits?.setEnabled(true);
         }));
-        this.startCoroutine(this.delayFunction(4, ()=>{ 
+        this.startCoroutine(this.delayFunctionWithInterupt(4, ()=>{ 
             Game.i.sm.swapScene(1);
         }));
 
     }
 
-    private * delayFunction(durationS:number, func: Function): Generator<any,any,number> {
+    private * delayFunctionWithInterupt(durationS:number, func: Function): Generator<any,any,number> {
         let totalTime = 0;
         while(true) {
             let elapsed = yield;
