@@ -29,13 +29,18 @@ export class AnimationControllerComponent extends GameComponent {
         this._animationConfig = animationConfig;
         this._spriteRenderer = spriteRenderer;
     }
-    setAnimation(name) {
+    setAnimation(name, immediately = false) {
         if (name in this._animationConfig) {
             this._numFrames = this._animationConfig[name].frames;
             this._yFrame = this._animationConfig[name].yFrame;
         }
         else {
             console.error(`Animation ${name} doesn't exist.`);
+        }
+        if (immediately) {
+            this._spriteRenderer.setFrame(0, this._yFrame);
+            this._frameTime = 0;
+            this._frame = 0;
         }
     }
     update(delta) {
@@ -47,12 +52,14 @@ export class AnimationControllerComponent extends GameComponent {
             this._frameTime -= this._frameSpeed;
             if (this._frame >= this._numFrames) {
                 this._playedOnce = true;
-                if (this.loop == true) {
+                this._numPlays--;
+                if (this.loop == true || this._numPlays > 0) {
                     this._frame = 0;
                 }
                 else {
                     this._frame = 0;
                     this.paused = true;
+                    this._ended = true;
                     for (let i = 0; i < this._onAnimationEnd.length; i++) {
                         this._onAnimationEnd[i]();
                     }
@@ -62,6 +69,7 @@ export class AnimationControllerComponent extends GameComponent {
         }
     }
     play(numTimes) {
+        this._ended = false;
         if (numTimes) {
             this._numPlays = numTimes;
         }

@@ -40,10 +40,13 @@ export class Scene {
     startCoroutine(generator) {
         this.coroutines.push(generator);
     }
-    *moveTo(entity, destination, durationMs) {
+    *moveTo(entity, destination, durationMs, callback) {
         let totalTime = 0;
+        if (!destination.x)
+            destination.x = entity.localX;
+        if (!destination.y)
+            destination.y = entity.localY;
         const { localX: originalX, localY: originalY } = entity;
-        console.log(originalX);
         while (true) {
             let elapsed = yield;
             totalTime += elapsed;
@@ -55,6 +58,8 @@ export class Scene {
             if (totalTime >= durationMs) {
                 entity.localX = destination.x;
                 entity.localY = destination.y;
+                if (callback)
+                    callback();
                 return;
             }
         }

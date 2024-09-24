@@ -13,6 +13,9 @@ export class TextRendererComponent extends GameComponent {
     private _colour: number;
 
     public get width(){ return this._width; }
+    public setColour(num: number){
+        this._colour = num;
+    }
 
     constructor(text: string, fontName: string, colour: number = 0){
         super();

@@ -3,15 +3,12 @@ import {GameObject} from "./GameObject.js";
 import {GraphicsManager} from "./GraphicsManager.js";
 
 /** The Scene class is a container for all GameObjects that are currently active. */
-export abstract class Scene {
+export class Scene {
 
     private gameObjects: GameObject[] = [];
     protected coroutines: Generator<any, any, number>[] = [];
 
     protected bgPaletteIndex = 3;
-
-    /** Override this function. This is where all the GameObjects should be created. */
-    public abstract create(): void;
 
     protected addGameobject(gameObject:GameObject): GameObject {
         this.gameObjects.push(gameObject);
@@ -54,10 +51,11 @@ export abstract class Scene {
         this.coroutines.push(generator);
     }
 
-    protected* moveTo(entity: GameObject, destination: {x: number, y: number}, durationMs: number): Generator<void, void, number> {
+    protected* moveTo(entity: GameObject, destination: {x?: number, y?: number}, durationMs: number, callback?: Function): Generator<void, void, number> {
         let totalTime = 0;
+        if(!destination.x) destination.x = entity.localX;
+        if(!destination.y) destination.y = entity.localY;
         const { localX: originalX, localY: originalY} = entity;
-        console.log(originalX)
         while(true) {
             let elapsed = yield;
             totalTime += elapsed;
@@ -70,6 +68,7 @@ export abstract class Scene {
             if (totalTime >= durationMs) {
                 entity.localX = destination.x;
                 entity.localY = destination.y;
+                if(callback) callback();
                 return;
             }
             

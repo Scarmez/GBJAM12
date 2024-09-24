@@ -52,9 +52,8 @@ export class AssetManager {
 
     loadAudio(key: string,path: string){
         let newAudio = new Audio(path);
+        newAudio.volume = 0.4;
         this.aud.attachAudio(newAudio);
-        console.log(`Loaded ${path}`);
-        //newAudio.play();
         this.audio.set(key, newAudio);
     }
 

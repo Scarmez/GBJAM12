@@ -84,12 +84,17 @@ export class GraphicsManager {
     public drawString(text: string, font: Sprite, x: number, y: number, colour: number = 0){
 
         let dstxOffset = 0;
+        let dstyOffset = 0;
         for(let i = 0; i < text.length; i++){
 
             let charAsciiIndex = text.charCodeAt(i);
+            if(charAsciiIndex == 10){
+                dstxOffset = 0;
+                dstyOffset += font.frameHeight;
+            }
             let charIndex = charAsciiIndex - 32;
             let srcX = charIndex * font.frameWidth % font.width;
-            let srcY = Math.floor((charIndex * font.frameWidth) / font.width) * font.frameHeight;
+            let srcY = Math.floor((charIndex * font.frameWidth) / font.width) * font.frameHeight + (colour * 24);
 
             this.drawImage(font,
                 srcX, 
@@ -97,7 +102,7 @@ export class GraphicsManager {
                 font.frameWidth, 
                 font.frameHeight,
                 x + dstxOffset, 
-                y, 
+                y + dstyOffset, 
                 font.frameWidth, 
                 font.frameHeight 
             );

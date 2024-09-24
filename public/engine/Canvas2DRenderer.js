@@ -30,11 +30,11 @@ export class Canvas2DRenderer extends Renderer {
         }
         if (dstWidth === undefined) {
             dstWidth = srcWidth;
-            srcWidth = sprite.width;
+            srcWidth = sprite.frameWidth;
         }
         if (dstHeight === undefined) {
             dstHeight = srcHeight;
-            srcHeight = sprite.height;
+            srcHeight = sprite.frameHeight;
         }
         if (srcRotation === undefined) {
             srcRotation = 0;
@@ -52,8 +52,9 @@ export class Canvas2DRenderer extends Renderer {
     setPalette(palette) {
         this._currentPaletteIndex = 0;
     }
-    clearScreen() {
-        this._ctx.clearRect(0, 0, this._ctx.canvas.width, this._ctx.canvas.height);
+    clearScreen(colour) {
+        this._ctx.fillStyle = `rgb(${colour.r},${colour.g},${colour.b})`;
+        this._ctx.fillRect(0, 0, this._ctx.canvas.width, this._ctx.canvas.height);
     }
     createSprite(spriteData) {
         let sprite = new Sprite(spriteData);

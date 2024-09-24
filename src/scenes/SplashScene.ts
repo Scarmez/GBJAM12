@@ -11,7 +11,10 @@ export class SplashScene extends Scene {
     private gbjamObject: GameObject|undefined;
     private credits: GameObject|undefined;
 
-    public create(): void {
+    constructor(){
+        super();
+        
+        this.addGameobject(new SpriteObject(0,0,0,0,"bg_zigzag"))
 
         this.credits = this.addGameobject(new GameObject(8,8,0,0));
         this.credits.setEnabled(false);

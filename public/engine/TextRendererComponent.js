@@ -7,6 +7,9 @@ export class TextRendererComponent extends GameComponent {
     _width = 0;
     _colour;
     get width() { return this._width; }
+    setColour(num) {
+        this._colour = num;
+    }
     constructor(text, fontName, colour = 0) {
         super();
         this._font = Game.i.assets.getSprite(fontName);

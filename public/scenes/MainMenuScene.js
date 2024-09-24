@@ -3,19 +3,35 @@ import { MenuObject } from "../engine/MenuObject.js";
 import { MenuOptionObject } from "../engine/MenuOptionObject.js";
 import { Scene } from "../engine/Scene.js";
 import { SpriteObject } from "../engine/SpriteObject.js";
+import { TextObject } from "../engine/TextObject.js";
 import { InputAction } from "../game/InputActions.js";
 import { SaveData } from "../game/SaveData.js";
 export class MainMenuScene extends Scene {
     mainMenu;
-    optionMenu;
-    controlsMenu;
+    //private optionMenu: MenuObject;
+    //private controlsMenu: MenuObject;
     bg_music;
-    create() {
+    title;
+    pressstarttext;
+    pressstartmode = true;
+    flashTimer = 0.2;
+    constructor() {
+        super();
         this.bg_music = Game.i.assets.getAudio("intro_theme");
-        this.addGameobject(new SpriteObject(0, -24, 0, 0, "splash"));
-        this.mainMenu = this.addGameobject(new MenuObject("frame", "cursor", 32, 96, 96, 40, "click"));
+        this.addGameobject(this.title = new SpriteObject(0, 0, 0, 0, "title_screen"));
+        this.pressstarttext = new TextObject("PRESS START", "font_rabbit", 0, 0);
+        this.pressstarttext.localX = 80 - this.pressstarttext.textRenderer.width / 2;
+        this.pressstarttext.localY = 144 - 24;
+        this.title.addChild(this.pressstarttext);
+        this.mainMenu = this.addGameobject(new MenuObject("", new SpriteObject(0, 0, 0, 0, "cursor"), 32, 112, 96, 40, "click"));
         if (SaveData.saveExists()) {
-            this.mainMenu.addOption(new MenuOptionObject("Continue", "font_rabbit", function () { }));
+            this.mainMenu.addOption(new MenuOptionObject("Continue", "font_rabbit", () => {
+                SaveData.load();
+                this.mainMenu.setEnabled(false);
+                this.bg_music?.pause();
+                Game.i.assets.getAudio("start_game")?.play();
+                this.startCoroutine(this.delayFunction(3, () => { Game.i.sm.swapScene(4); }));
+            }));
         }
         this.mainMenu.addOption(new MenuOptionObject("New Game", "font_rabbit", () => {
             this.mainMenu.setEnabled(false);
@@ -23,6 +39,8 @@ export class MainMenuScene extends Scene {
             Game.i.assets.getAudio("start_game")?.play();
             this.startCoroutine(this.delayFunction(3, () => { Game.i.sm.swapScene(2); }));
         }));
+        this.mainMenu.setIndex(0);
+        this.mainMenu.setEnabled(false);
         // this.mainMenu.addOption(new MenuOptionObject("Options", "font_rabbit", this.showOptions.bind(this)));
         // let palettePicker = new UIHorizontalPickerObject("Pallete: ", "font_Torment") as UIHorizontalPickerObject;
         // palettePicker.addOption({text: "LAVA-GB", onSelect: function(){Game.i.gfx.setPalette(0)}});
@@ -46,22 +64,22 @@ export class MainMenuScene extends Scene {
         // this.controlsMenu.setEnabled(false);
         // this.controlsMenu.setCancelFunction(this.hideControls.bind(this));
     }
-    showOptions() {
-        this.optionMenu?.setEnabled(true);
-        this.mainMenu?.setEnabled(false);
-    }
-    hideOptions() {
-        this.optionMenu?.setEnabled(false);
-        this.mainMenu?.setEnabled(true);
-    }
-    showControls() {
-        this.optionMenu?.setEnabled(false);
-        this.controlsMenu?.setEnabled(true);
-    }
-    hideControls() {
-        this.optionMenu?.setEnabled(true);
-        this.controlsMenu?.setEnabled(false);
-    }
+    // public showOptions(){
+    //     this.optionMenu?.setEnabled(true);
+    //     this.mainMenu?.setEnabled(false)
+    // }
+    // public hideOptions(){
+    //     this.optionMenu?.setEnabled(false);
+    //     this.mainMenu?.setEnabled(true);
+    // }
+    // public showControls(){
+    //     this.optionMenu?.setEnabled(false);
+    //     this.controlsMenu?.setEnabled(true);
+    // }
+    // public hideControls(){
+    //     this.optionMenu?.setEnabled(true);
+    //     this.controlsMenu?.setEnabled(false);
+    // }
     enter() {
         this.bg_music.loop = true;
         this.bg_music.play();
@@ -70,6 +88,20 @@ export class MainMenuScene extends Scene {
         this.bg_music.pause();
     }
     update(delta) {
+        if (this.pressstartmode) {
+            this.flashTimer -= delta;
+            if (this.flashTimer <= 0) {
+                this.flashTimer = 0.5;
+                this.pressstarttext.setEnabled(!this.pressstarttext.isEnabled);
+            }
+            if (Game.i.input.consumeInput(InputAction.START)) {
+                this.pressstartmode = false;
+                Game.i.assets.getAudio("select").currentTime = 0;
+                Game.i.assets.getAudio("select")?.play();
+                this.pressstarttext.setEnabled(false);
+                this.mainMenu.setEnabled(true);
+            }
+        }
         if (Game.i.input.consumeInput(InputAction.START)) {
             this.mainMenu?.selectOption();
         }

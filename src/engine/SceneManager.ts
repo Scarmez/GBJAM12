@@ -4,37 +4,35 @@ import {GraphicsManager} from "./GraphicsManager.js";
 /** SceneManager manages the Scenes. Entering, Exiting and creation of scenes. Swapping Scenes etc. */
 export class SceneManager {
 
-    private scenes: Scene[] = [];
+    private scenes: typeof Scene[] = [];
     private activeSceneIndex: number = 0;
+    private activeScene: Scene | undefined;
 
     /** Add all the scenes for your Game before you call Game.StartLoop(). */
-    public addScene(scene:Scene){
+    public addScene(scene:typeof Scene){
         this.scenes.push(scene);
-        if(this.scenes.length == 1) this.scenes[0].create();
+        if(this.scenes.length == 1) this.activeScene = new scene();
     }
 
-    /** Swap active scene to new index.*/
     public swapScene(index: number): void {
-        if(index >= this.scenes.length) return console.error(`Could not load scene index ${index}`);
-        this.scenes[this.activeSceneIndex].exit();
-        this.activeSceneIndex = index;
-        this.scenes[this.activeSceneIndex].create();
-        this.scenes[this.activeSceneIndex].enter();
+        this.activeScene!.exit();
+        this.activeScene = new this.scenes[index]();
+        this.activeScene.enter();
     }
 
     /** Used by the Game class to start the game. */
     public start(){
-        this.scenes[0].enter();
+        this.activeScene?.enter();
     }
 
     /** Called by the Game class. Don't call this directly. */
     public update(delta: number): void {
-        this.scenes[this.activeSceneIndex].doUpdate(delta);
+        this.activeScene?.doUpdate(delta);
     }
 
     /** Called by the Game class. Don't call this directly. */
     public draw(gfx: GraphicsManager): void {
-        this.scenes[this.activeSceneIndex].doDraw(gfx);
+        this.activeScene?.doDraw(gfx);
     }
 
 }

@@ -2,7 +2,6 @@ import { GameObject } from "./GameObject.js";
 import { Game } from "./Game.js";
 import { InputAction } from "../game/InputActions.js";
 import { SpriteRendererComponent } from "./SpriteRendererComponent.js";
-import { SpriteObject } from "./SpriteObject.js";
 export class MenuObject extends GameObject {
     options = [];
     currentIndex = 0;
@@ -13,11 +12,15 @@ export class MenuObject extends GameObject {
     onDownInput;
     onLeftInput;
     onRightInput;
-    constructor(frameSpriteName, cursorSpriteName, x, y, w, h, selectSound) {
+    cursorOffset = { x: 8, y: 0 };
+    interactable = true;
+    constructor(frameSpriteName, cursorObject, x, y, w, h, changeSound) {
         super(x, y, w, h);
-        this.cursorObject = this.addChild(new SpriteObject(8, 8, 8, 8, cursorSpriteName));
-        this.changeSound = selectSound ? Game.i.assets.getAudio(selectSound) : undefined;
-        this.addComponent(new SpriteRendererComponent(frameSpriteName, SpriteRendererComponent.DrawModes.Sliced));
+        if (cursorObject)
+            this.cursorObject = this.addChild(cursorObject);
+        this.changeSound = changeSound ? Game.i.assets.getAudio(changeSound) : undefined;
+        if (frameSpriteName)
+            this.addComponent(new SpriteRendererComponent(frameSpriteName, SpriteRendererComponent.DrawModes.Sliced));
     }
     addOption(option) {
         this.options.push(option);
@@ -36,6 +39,8 @@ export class MenuObject extends GameObject {
         this.cancelFunction = func;
     }
     update(delta) {
+        if (!this.interactable)
+            return;
         if (Game.i.input.consumeInput(InputAction.DOWN)) {
             if (this.onDownInput) {
                 this.onDownInput();
@@ -71,6 +76,8 @@ export class MenuObject extends GameObject {
         }
     }
     changeIndex(num) {
+        if (this.options.length == 0)
+            return;
         let previousIndex = this.currentIndex;
         this.currentIndex += num;
         if (this.currentIndex >= this.options.length)
@@ -79,15 +86,24 @@ export class MenuObject extends GameObject {
             this.currentIndex += this.options.length;
         if (this.currentIndex == previousIndex)
             return;
-        this.options[this.currentIndex].unhover();
+        this.options[previousIndex].unhover();
         this.options[this.currentIndex].hover();
         if (this.cursorObject) {
-            this.cursorObject.localX = this.options[this.currentIndex].localX - 8;
-            this.cursorObject.localY = this.options[this.currentIndex].localY;
+            this.cursorObject.localX = this.options[this.currentIndex].localX - this.cursorOffset.x;
+            this.cursorObject.localY = this.options[this.currentIndex].localY - this.cursorOffset.y;
         }
         if (this.changeSound) {
             this.changeSound.currentTime = 0;
             this.changeSound.play();
+        }
+    }
+    setIndex(num) {
+        this.options[this.currentIndex].unhover();
+        this.currentIndex = num;
+        this.options[this.currentIndex].hover();
+        if (this.cursorObject) {
+            this.cursorObject.localX = this.options[this.currentIndex].localX - this.cursorOffset.x;
+            this.cursorObject.localY = this.options[this.currentIndex].localY - this.cursorOffset.y;
         }
     }
 }

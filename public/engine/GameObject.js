@@ -19,8 +19,20 @@ export class GameObject {
     set localPos(pos) { this.pos = pos; }
     get globalX() { if (this.parent)
         return this._x + this.parent.globalX; return this._x; }
+    set globalX(x) { if (this.parent) {
+        this._x = x - this.parent.globalX;
+    }
+    else {
+        this._x = x;
+    } }
     get globalY() { if (this.parent)
         return this._y + this.parent.globalY; return this._y; }
+    set globalY(y) { if (this.parent) {
+        this._y = y - this.parent.globalY;
+    }
+    else {
+        this._y = y;
+    } }
     get globalPos() { if (this.parent)
         return this.pos.add(this.parent.globalPos); return this.pos; }
     get width() { return this.w; }

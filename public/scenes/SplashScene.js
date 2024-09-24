@@ -8,7 +8,9 @@ import { InputAction } from "../game/InputActions.js";
 export class SplashScene extends Scene {
     gbjamObject;
     credits;
-    create() {
+    constructor() {
+        super();
+        this.addGameobject(new SpriteObject(0, 0, 0, 0, "bg_zigzag"));
         this.credits = this.addGameobject(new GameObject(8, 8, 0, 0));
         this.credits.setEnabled(false);
         let fontName = GameSettings.i.getValue("defaultFont", "font_rabbit");

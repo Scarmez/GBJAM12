@@ -13,6 +13,8 @@ export class SpriteObject extends GameObject {
         
         super(x,y,w,h);
         this._spriteRenderer = this.addComponent(new SpriteRendererComponent(spriteName)) as SpriteRendererComponent;
+        this.w = this._spriteRenderer.getSprite().frameWidth;
+        this.h = this._spriteRenderer.getSprite().frameHeight;
 
     }
 

@@ -20,6 +20,10 @@ export class SpriteRendererComponent extends GameComponent {
     private _xFrame: number = 0;
     private _yFrame: number = 0;
 
+    public flipY: boolean = false;
+    public flipX: boolean = false;
+    public rotation: number = 0;
+
     constructor(spriteName: string, drawMode?: DrawModes){
         super();
         this._sprite = Game.i.assets.getSprite(spriteName);;
@@ -52,7 +56,7 @@ export class SpriteRendererComponent extends GameComponent {
     }
 
     private drawBasic(gfx: GraphicsManager){
-        gfx.drawImage(this._sprite, this._xFrame * this._sprite.frameWidth, this._yFrame * this._sprite.frameHeight, this._sprite.frameWidth, this._sprite.frameHeight, this.gameObject!.globalX, this.gameObject!.globalY);
+        gfx.drawImage(this._sprite, this._xFrame * this._sprite.frameWidth, this._yFrame * this._sprite.frameHeight, this._sprite.frameWidth, this._sprite.frameHeight, this.gameObject!.globalX, this.gameObject!.globalY, undefined, undefined, this.flipX, this.flipY, this.rotation);
     }
 
     private drawSliced(gfx: GraphicsManager){

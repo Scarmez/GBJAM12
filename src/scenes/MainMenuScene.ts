@@ -4,25 +4,42 @@ import { MenuObject } from "../engine/MenuObject.js";
 import { MenuOptionObject } from "../engine/MenuOptionObject.js";
 import { Scene } from "../engine/Scene.js";
 import { SpriteObject } from "../engine/SpriteObject.js";
+import { TextObject } from "../engine/TextObject.js";
 import { InputAction } from "../game/InputActions.js";
 import { SaveData } from "../game/SaveData.js";
 
 export class MainMenuScene extends Scene {
 
-    private mainMenu: MenuObject|undefined;
-    private optionMenu: MenuObject|undefined;
-    private controlsMenu: MenuObject|undefined;
-    private bg_music: HTMLAudioElement | undefined;
+    private mainMenu: MenuObject;
+    //private optionMenu: MenuObject;
+    //private controlsMenu: MenuObject;
+    private bg_music: HTMLAudioElement;
+    private title: SpriteObject;
+    private pressstarttext: TextObject;
 
-    public create(): void {
-        
-        this.bg_music = Game.i.assets.getAudio("intro_theme");
+    private pressstartmode = true;
+    private flashTimer = 0.2;
 
-        this.addGameobject(new SpriteObject(0,-24,0,0,"splash"));
+    constructor(){
+        super();
 
-        this.mainMenu = this.addGameobject(new MenuObject("frame", "cursor", 32, 96, 96, 40, "click")) as MenuObject;
+        this.bg_music = Game.i.assets.getAudio("intro_theme")!;
+
+        this.addGameobject(this.title = new SpriteObject(0,0,0,0,"title_screen"));
+        this.pressstarttext = new TextObject("PRESS START", "font_rabbit", 0,0);
+        this.pressstarttext.localX = 80 - this.pressstarttext.textRenderer.width/2;
+        this.pressstarttext.localY = 144 - 24;
+        this.title.addChild(this.pressstarttext);
+
+        this.mainMenu = this.addGameobject(new MenuObject("", new SpriteObject(0,0,0,0,"cursor"), 32, 112, 96, 40, "click")) as MenuObject;
         if(SaveData.saveExists()) {
-            this.mainMenu.addOption(new MenuOptionObject("Continue", "font_rabbit", function(){  }));
+            this.mainMenu.addOption(new MenuOptionObject("Continue", "font_rabbit", ()=>{ 
+                SaveData.load();
+                this.mainMenu!.setEnabled(false);
+                this.bg_music?.pause();
+                Game.i.assets.getAudio("start_game")?.play();
+                this.startCoroutine(this.delayFunction(3, ()=>{Game.i.sm.swapScene(4); }))
+            }));
         }
     
         this.mainMenu.addOption(new MenuOptionObject("New Game", "font_rabbit", ()=>{ 
@@ -31,6 +48,9 @@ export class MainMenuScene extends Scene {
             Game.i.assets.getAudio("start_game")?.play();
             this.startCoroutine(this.delayFunction(3, ()=>{Game.i.sm.swapScene(2); }))
         }));
+
+        this.mainMenu.setIndex(0);
+        this.mainMenu.setEnabled(false);
 
         // this.mainMenu.addOption(new MenuOptionObject("Options", "font_rabbit", this.showOptions.bind(this)));
 
@@ -59,30 +79,27 @@ export class MainMenuScene extends Scene {
         // this.controlsMenu = this.addGameobject(new MenuObject(GameSettings.i.getValue("defaultFrame", "frame0"), 0, 0, 160, 144)) as MenuObject;
         // this.controlsMenu.setEnabled(false);
         // this.controlsMenu.setCancelFunction(this.hideControls.bind(this));
-
-
-
     }
 
-    public showOptions(){
-        this.optionMenu?.setEnabled(true);
-        this.mainMenu?.setEnabled(false)
-    }
+    // public showOptions(){
+    //     this.optionMenu?.setEnabled(true);
+    //     this.mainMenu?.setEnabled(false)
+    // }
 
-    public hideOptions(){
-        this.optionMenu?.setEnabled(false);
-        this.mainMenu?.setEnabled(true);
-    }
+    // public hideOptions(){
+    //     this.optionMenu?.setEnabled(false);
+    //     this.mainMenu?.setEnabled(true);
+    // }
 
-    public showControls(){
-        this.optionMenu?.setEnabled(false);
-        this.controlsMenu?.setEnabled(true);
-    }
+    // public showControls(){
+    //     this.optionMenu?.setEnabled(false);
+    //     this.controlsMenu?.setEnabled(true);
+    // }
 
-    public hideControls(){
-        this.optionMenu?.setEnabled(true);
-        this.controlsMenu?.setEnabled(false);
-    }
+    // public hideControls(){
+    //     this.optionMenu?.setEnabled(true);
+    //     this.controlsMenu?.setEnabled(false);
+    // }
 
     public enter(): void {
         this.bg_music!.loop = true;
@@ -94,6 +111,23 @@ export class MainMenuScene extends Scene {
     }
 
     public update(delta: number): void {
+        
+        if(this.pressstartmode ){
+            this.flashTimer -= delta;
+            if(this.flashTimer <= 0){
+                this.flashTimer = 0.5;
+                this.pressstarttext.setEnabled(!this.pressstarttext.isEnabled);
+            }
+            if(Game.i.input.consumeInput(InputAction.START)){
+                this.pressstartmode = false;
+                Game.i.assets.getAudio("select")!.currentTime = 0;
+                Game.i.assets.getAudio("select")?.play()
+                this.pressstarttext.setEnabled(false)
+                this.mainMenu!.setEnabled(true);
+            }
+
+        }
+
         if(Game.i.input.consumeInput(InputAction.START)){
             this.mainMenu?.selectOption();
         };

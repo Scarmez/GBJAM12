@@ -58,12 +58,17 @@ export class GraphicsManager {
     /** Draws a strong to the screen using the specified Font Sprite. */
     drawString(text, font, x, y, colour = 0) {
         let dstxOffset = 0;
+        let dstyOffset = 0;
         for (let i = 0; i < text.length; i++) {
             let charAsciiIndex = text.charCodeAt(i);
+            if (charAsciiIndex == 10) {
+                dstxOffset = 0;
+                dstyOffset += font.frameHeight;
+            }
             let charIndex = charAsciiIndex - 32;
             let srcX = charIndex * font.frameWidth % font.width;
-            let srcY = Math.floor((charIndex * font.frameWidth) / font.width) * font.frameHeight;
-            this.drawImage(font, srcX, srcY, font.frameWidth, font.frameHeight, x + dstxOffset, y, font.frameWidth, font.frameHeight);
+            let srcY = Math.floor((charIndex * font.frameWidth) / font.width) * font.frameHeight + (colour * 24);
+            this.drawImage(font, srcX, srcY, font.frameWidth, font.frameHeight, x + dstxOffset, y + dstyOffset, font.frameWidth, font.frameHeight);
             if (charAsciiIndex in font.overrides) {
                 dstxOffset += font.overrides[charAsciiIndex];
             }

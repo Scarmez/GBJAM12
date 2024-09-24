@@ -10,19 +10,22 @@ export class MenuObject extends GameObject {
     private options: MenuOptionObject[] = []
     private currentIndex: number = 0;
     private cancelFunction: Function|undefined;
-    private cursorObject: GameObject;
+    private cursorObject: GameObject | undefined;
     private changeSound: HTMLAudioElement | undefined;
-
+    
     public onUpInput: Function | undefined;
     public onDownInput: Function | undefined;
     public onLeftInput: Function | undefined;
     public onRightInput: Function | undefined;
 
-    constructor(frameSpriteName: string, cursorSpriteName: string, x:number, y:number, w:number, h:number, selectSound?: string){
+    public cursorOffset = {x: 8, y: 0};
+    public interactable = true;
+
+    constructor(frameSpriteName: string, cursorObject: GameObject|undefined, x:number, y:number, w:number, h:number, changeSound?: string){
         super(x,y,w,h);
-        this.cursorObject = this.addChild(new SpriteObject(8,8,8,8,cursorSpriteName));
-        this.changeSound = selectSound? Game.i.assets.getAudio(selectSound) : undefined;
-        this.addComponent(new SpriteRendererComponent(frameSpriteName, SpriteRendererComponent.DrawModes.Sliced))
+        if(cursorObject) this.cursorObject = this.addChild(cursorObject);
+        this.changeSound = changeSound? Game.i.assets.getAudio(changeSound) : undefined;
+        if(frameSpriteName)this.addComponent(new SpriteRendererComponent(frameSpriteName, SpriteRendererComponent.DrawModes.Sliced))
     }
 
     public addOption(option: MenuOptionObject): MenuOptionObject{
@@ -44,6 +47,7 @@ export class MenuObject extends GameObject {
 
     protected update(delta: number): void {
 
+        if(!this.interactable) return;
         if(Game.i.input.consumeInput(InputAction.DOWN)) {
             if(this.onDownInput) {
                 this.onDownInput();
@@ -82,6 +86,7 @@ export class MenuObject extends GameObject {
 
     changeIndex(num: number){
 
+        if(this.options.length == 0) return;
         let previousIndex = this.currentIndex;
 
         this.currentIndex += num;
@@ -90,12 +95,12 @@ export class MenuObject extends GameObject {
 
         if(this.currentIndex == previousIndex) return;
 
-        this.options[this.currentIndex].unhover();
+        this.options[previousIndex].unhover();
         this.options[this.currentIndex].hover();
 
         if(this.cursorObject) {
-            this.cursorObject.localX = this.options[this.currentIndex].localX - 8;
-            this.cursorObject.localY = this.options[this.currentIndex].localY;
+            this.cursorObject.localX = this.options[this.currentIndex].localX - this.cursorOffset.x;
+            this.cursorObject.localY = this.options[this.currentIndex].localY - this.cursorOffset.y;
         }
         
         if(this.changeSound){
@@ -103,6 +108,18 @@ export class MenuObject extends GameObject {
             this.changeSound.play();
         }
 
+    }
+
+    setIndex(num: number){
+
+        this.options[this.currentIndex].unhover();
+        this.currentIndex = num;
+        this.options[this.currentIndex].hover();
+
+        if(this.cursorObject) {
+            this.cursorObject.localX = this.options[this.currentIndex].localX - this.cursorOffset.x;
+            this.cursorObject.localY = this.options[this.currentIndex].localY - this.cursorOffset.y;
+        }
     }
 
 }

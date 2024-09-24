@@ -3,6 +3,7 @@ import {Sprite} from "./Sprite.js";
 import {Palette} from "./Palette.js";
 import { SpriteData } from "./SpriteData.js";
 import { GraphicsManager } from "./GraphicsManager.js";
+import { Colour } from "./Colour.js";
 export class Canvas2DRenderer extends Renderer {
 
     private _ctx: CanvasRenderingContext2D;
@@ -24,11 +25,11 @@ export class Canvas2DRenderer extends Renderer {
         if (srcHeight === undefined) { srcHeight = sprite.height; }
         if (dstWidth === undefined) {
             dstWidth = srcWidth;
-            srcWidth = sprite.width;
+            srcWidth = sprite.frameWidth;
         }
         if (dstHeight === undefined) {
             dstHeight = srcHeight;
-            srcHeight = sprite.height;
+            srcHeight = sprite.frameHeight;
         }
         if (srcRotation === undefined) {
             srcRotation = 0;
@@ -50,8 +51,9 @@ export class Canvas2DRenderer extends Renderer {
         this._currentPaletteIndex = 0;
     }
     
-    public clearScreen(): void {
-        this._ctx.clearRect(0, 0, this._ctx.canvas.width, this._ctx.canvas.height);
+    public clearScreen(colour: Colour): void {
+        this._ctx.fillStyle = `rgb(${colour.r},${colour.g},${colour.b})`
+        this._ctx.fillRect(0, 0, this._ctx.canvas.width, this._ctx.canvas.height);
     }
 
     public createSprite(spriteData: SpriteData): Sprite {

@@ -7,5 +7,7 @@ export class SpriteObject extends GameObject {
     constructor(x, y, w, h, spriteName) {
         super(x, y, w, h);
         this._spriteRenderer = this.addComponent(new SpriteRendererComponent(spriteName));
+        this.w = this._spriteRenderer.getSprite().frameWidth;
+        this.h = this._spriteRenderer.getSprite().frameHeight;
     }
 }

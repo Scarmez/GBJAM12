@@ -27,7 +27,9 @@ export class GameObject {
     public set localPos(pos:Vector2) { this.pos = pos; }
 
     public get globalX():number { if(this.parent) return this._x + this.parent.globalX; return this._x; }
+    public set globalX(x: number) { if(this.parent){ this._x = x - this.parent.globalX } else { this._x = x;}}
     public get globalY():number { if(this.parent) return this._y + this.parent.globalY; return this._y; }
+    public set globalY(y: number) { if(this.parent){ this._y = y - this.parent.globalY } else { this._y = y;}}
     public get globalPos():Vector2 {if(this.parent) return this.pos.add(this.parent.globalPos); return this.pos; }
 
     public get width():number { return this.w; }
